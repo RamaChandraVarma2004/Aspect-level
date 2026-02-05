@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aspect-Level Opinion Mining</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body>
+  <main class="container">
+    <header>
+      <h1>Aspect-Level Opinion Mining</h1>
+      <p>Explainable NLP pipeline for extracting product aspects and sentiment per aspect.</p>
+    </header>
+
+    <section class="card">
+      <form action="/analyze" method="post">
+        <label for="review">Paste a review</label>
+        <textarea id="review" name="review" rows="7" placeholder="Type your review here...">{{ review or example_review }}</textarea>
+        <div class="actions">
+          <button type="submit">Analyze Review</button>
+        </div>
+      </form>
+      {% if error %}
+      <p class="error">{{ error }}</p>
+      {% endif %}
+    </section>
+
+    {% if result %}
+    <section class="card">
+      <h2>Aspect Sentiment Table</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Aspect</th>
+            <th>Sentiment</th>
+            <th>Score</th>
+            <th>Evidence</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in result.aspect_results %}
+          <tr>
+            <td>{{ row.aspect }}</td>
+            <td><span class="pill {{ row.sentiment }}">{{ row.sentiment }}</span></td>
+            <td>{{ row.score }}</td>
+            <td>
+              {% if row.opinions %}
+                {% for op in row.opinions %}
+                <div><code>{{ op.token }}</code> ({{ op.score }}) — {{ op.reason }}</div>
+                {% endfor %}
+              {% else %}
+                <span class="muted">No strong opinion word linked.</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <h3>JSON Output</h3>
+      <pre>{{ result | tojson(indent=2) }}</pre>
+    </section>
+    {% endif %}
+  </main>
+</body>
+</html>
