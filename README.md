@@ -17,6 +17,13 @@ A ready-to-run, modular NLP project that extracts product **aspects** from user 
 - Aspect-opinion association with distance-based heuristics
 - Clear UI table + JSON output + evidence trace
 
+## Pipeline overview (intern-friendly)
+1. **Preprocess:** spaCy handles sentence splitting, tokenization, lowercasing, and lemmatization.
+2. **Extract aspects:** nouns and noun phrases become aspect candidates; stopwords and generic nouns are filtered.
+3. **Find opinions:** adjectives/verbs that appear in a small sentiment lexicon.
+4. **Score sentiment:** apply lexicon polarity with simple negation + intensifier rules.
+5. **Map opinions to aspects:** attach each aspect to nearby opinion words in its sentence.
+
 ## Project structure
 
 ```text
@@ -75,6 +82,15 @@ Open the URL shown by Streamlit (usually `http://localhost:8501`).
   }
 ]
 ```
+
+## Example output (table-style)
+
+| Aspect | Sentiment | Score | Evidence |
+| --- | --- | --- | --- |
+| battery life | positive | 1.7 | amazing |
+| camera quality | negative | -1.1 | good (negated) |
+| screen | positive | 1.6 | love |
+| speakers | negative | -1.3 | weak (intensified) |
 
 ## Design choices
 1. **Modular architecture**: each NLP step has its own module for maintainability and explainability.
