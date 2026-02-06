@@ -14,7 +14,8 @@ class TextPreprocessor:
     """Loads and serves a spaCy pipeline used by all downstream modules.
 
     Keeping this step isolated makes the system modular and easier to profile,
-    test, and replace (e.g., switch to a transformer pipeline later).
+    test, and replace (e.g., switch to a transformer pipeline later). spaCy
+    handles sentence splitting, tokenization, lemmatization, and stopword flags.
     """
 
     def __init__(self, config: PreprocessConfig | None = None):

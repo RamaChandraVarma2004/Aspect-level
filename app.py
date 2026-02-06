@@ -14,7 +14,7 @@ st.caption("Rule-based, interpretable NLP pipeline for internship-ready demos.")
 with st.expander("How this works"):
     st.markdown(
         """
-        1. **Preprocessing:** sentence split + tokenization + lemmatization via spaCy.
+        1. **Preprocessing:** sentence split, tokenization, lowercasing, stopwords, lemmatization via spaCy.
         2. **Aspect extraction:** noun chunks and useful nouns (supports multi-word aspects).
         3. **Opinion detection:** adjective/verb sentiment words.
         4. **Scoring:** lexicon polarity with negation and intensifier rules.

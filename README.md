@@ -9,7 +9,7 @@ A ready-to-run, modular NLP project that extracts product **aspects** from user 
 - Prioritizes readable, production-style structure
 
 ## Features
-- Sentence segmentation, tokenization, lemmatization (spaCy)
+- Sentence segmentation, tokenization, lowercasing, stopword handling, lemmatization (spaCy)
 - POS-aware aspect and opinion extraction
 - Multi-word aspect support (e.g., `battery life`, `camera quality`)
 - Rule-based sentiment scoring (positive/negative/neutral)
