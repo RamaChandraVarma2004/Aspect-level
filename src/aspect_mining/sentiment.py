@@ -8,7 +8,7 @@ class SentimentScorer:
     """Rule-based sentiment scoring with negation and intensity handling."""
 
     def score_opinion(self, sentence, opinion_tok, aspect_center: int) -> OpinionEvidence:
-        lemma = opinion_tok.lemma_.lower()
+        lemma = (opinion_tok.lemma_ or opinion_tok.text).lower()
         base = SENTIMENT_LEXICON.get(lemma, 0.0)
         adjusted = base
 

@@ -1,31 +1,73 @@
-# Aspect-Level Opinion Mining (Python + Streamlit)
+# Aspect-Level Opinion Mining Lab (Explainable NLP + Streamlit)
 
-A ready-to-run, modular NLP project that extracts product **aspects** from user reviews and predicts sentiment polarity for each aspect.
+A resume-ready internship project that performs **aspect-level opinion mining** on product reviews using a transparent, rule-based NLP pipeline.
 
-## Why this project is internship-friendly
-- Uses an explicit and explainable NLP pipeline (easy to discuss in interviews)
-- Handles multi-aspect sentences with mixed opinions
-- Includes a clean UI for non-technical demos
-- Prioritizes readable, production-style structure
+## Problem Statement
+Users often write one review containing mixed opinions across multiple product features (e.g., *"battery is great, camera is bad"*). Document-level sentiment misses this nuance.
 
-## Features
-- Sentence segmentation, tokenization, lemmatization (spaCy)
-- POS-aware aspect and opinion extraction
-- Multi-word aspect support (e.g., `battery life`, `camera quality`)
-- Rule-based sentiment scoring (positive/negative/neutral)
-- Negation and intensifier handling (e.g., `not good`, `very weak`)
-- Aspect-opinion association with distance-based heuristics
-- Clear UI table + JSON output + evidence trace
+This project extracts:
+1. Product aspects (noun / noun phrases)
+2. Aspect-specific sentiment (positive / negative / neutral)
+3. Aggregated sentiment statistics across many reviews
+4. Explainable evidence for every decision
 
-## Pipeline overview (intern-friendly)
-1. **Preprocess:** spaCy handles sentence splitting, tokenization, lowercasing, and lemmatization.
-2. **Extract aspects:** nouns and noun phrases become aspect candidates; stopwords and generic nouns are filtered.
-3. **Find opinions:** adjectives/verbs that appear in a small sentiment lexicon.
-4. **Score sentiment:** apply lexicon polarity with simple negation + intensifier rules.
-5. **Map opinions to aspects:** attach each aspect to nearby opinion words in its sentence.
+---
 
-## Project structure
+## Core Features
+- Single-review and multi-review analysis
+- Full NLP preprocessing pipeline:
+  - sentence segmentation
+  - tokenization
+  - lowercasing
+  - lemmatization
+  - stopword-aware aspect cleaning
+- POS-based linguistic analysis
+- Multi-word aspect extraction (`battery life`, `screen quality`)
+- Rule-based sentiment with negation + intensifier handling
+- Aspect-opinion proximity mapping for mixed-sentiment sentences
+- Aggregation module with:
+  - positive / negative / neutral counts
+  - aspect frequency
+  - dominant sentiment
+  - average sentiment score
+- Streamlit UI with **4 simultaneously runnable versions**
 
+---
+
+## Explainable Pipeline
+1. **Input handling**: parse one or more reviews.
+2. **Preprocessing**: spaCy sentence split + tokenization + lemmatization.
+3. **Linguistic analysis**: POS tags identify noun-based aspects and adjective/verb opinions.
+4. **Aspect extraction**: noun chunks + filtered nouns form candidate aspects.
+5. **Sentiment scoring**: lexicon polarity adjusted by negation/intensifiers.
+6. **Aspect-opinion association**: nearest-in-sentence opinions weighted by distance.
+7. **Aggregation**: per-aspect mention counts and dominant sentiment across reviews.
+8. **Presentation**: tables/cards/charts/JSON for technical and non-technical users.
+
+---
+
+## Four Distinct Versions in UI
+The app supports four analysis variants with intentionally different output styles:
+
+- **Version 1 – Balanced Rule Pipeline**
+  - Default behavior
+  - Dataframe + aggregation table + aspect-frequency bar chart
+
+- **Version 2 – Conservative Precision Mode**
+  - Keeps multi-word aspects and nearest evidence only
+  - Card-style analyst summaries and confidence-style progress bars
+
+- **Version 3 – Recall + Strength Emphasis**
+  - Boosts repeated aspect mentions in a review
+  - Metrics + area chart + weighted mention table
+
+- **Version 4 – Contrast-Aware Briefing**
+  - Highlights trade-off reviews containing contrast markers (`but`, `however`)
+  - Review-by-review briefing blocks + JSON summary output
+
+---
+
+## Project Structure
 ```text
 .
 ├── app.py
@@ -39,13 +81,15 @@ A ready-to-run, modular NLP project that extracts product **aspects** from user 
 │   ├── sentiment.py
 │   ├── association.py
 │   ├── schemas.py
-│   └── pipeline.py
+│   ├── pipeline.py
+│   └── variants.py
 └── tests/
     └── test_pipeline.py
 ```
 
-## Quick start
+---
 
+## Quick Start
 ```bash
 python -m venv .venv
 source .venv/bin/activate
@@ -54,57 +98,37 @@ python -m spacy download en_core_web_sm
 streamlit run app.py
 ```
 
-Open the URL shown by Streamlit (usually `http://localhost:8501`).
+---
 
-## Example input
-
-> The battery life is amazing, but the camera quality is not good. I love the screen, though the speakers are very weak.
-
-## Example output (shape)
-
-```json
-[
-  {
-    "aspect": "battery life",
-    "sentiment": "positive",
-    "score": 1.7,
-    "sentence": "The battery life is amazing, but the camera quality is not good.",
-    "evidences": [
-      {
-        "word": "amazing",
-        "base_score": 2.5,
-        "adjusted_score": 2.1,
-        "negated": false,
-        "intensifier": null,
-        "distance": 2
-      }
-    ]
-  }
-]
+## Example Input (one review per line)
+```text
+Battery life is excellent and charging speed is fast, but the camera is disappointing in low light.
+The screen quality is amazing. Speakers are weak and the phone feels heavy.
+I love the design and display, however the software experience is not smooth.
 ```
 
-## Example output (table-style)
+## Example Output Shape
+```json
+{
+  "aspect": "battery life",
+  "frequency": 4,
+  "positive": 3,
+  "negative": 1,
+  "neutral": 0,
+  "avg_score": 0.91,
+  "dominant_sentiment": "positive"
+}
+```
 
-| Aspect | Sentiment | Score | Evidence |
-| --- | --- | --- | --- |
-| battery life | positive | 1.7 | amazing |
-| camera quality | negative | -1.1 | good (negated) |
-| screen | positive | 1.6 | love |
-| speakers | negative | -1.3 | weak (intensified) |
-
-## Design choices
-1. **Modular architecture**: each NLP step has its own module for maintainability and explainability.
-2. **Rule-first approach**: transparent rules beat black-box behavior for interview demos.
-3. **Distance-aware association**: simple but practical for sentences containing multiple aspects.
-4. **Evidence trace**: every sentiment label links to concrete opinion words and adjustments.
+---
 
 ## Limitations
-- Lexicon is intentionally compact; domain coverage can be expanded.
-- Rules may miss implicit sentiment (e.g., sarcasm, nuanced context).
-- Dependency heuristics are lightweight, not full relation extraction.
+- Lexicon coverage is intentionally compact for explainability.
+- Rule-based linking can miss implicit sentiment and sarcasm.
+- Not dependency-tree perfect for long, complex sentences.
 
-## Future improvements
-- Add domain-adaptive sentiment lexicons (electronics, restaurants, etc.).
-- Add confidence calibration and weak-supervision evaluation set.
-- Train a hybrid reranker on top of rule outputs for harder cases.
-- Export results to CSV/API endpoint for product integration.
+## Future Improvements
+- Domain-specific aspect and sentiment lexicons (phones, laptops, cosmetics).
+- Better coreference resolution (e.g., handling pronouns like *it*).
+- Export pipeline results as API endpoints.
+- Add lightweight confidence estimates and calibration checks.
