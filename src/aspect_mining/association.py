@@ -14,6 +14,7 @@ class AspectOpinionAssociator:
     def __init__(self):
         self.features = LinguisticFeatureExtractor()
         self.sentiment = SentimentScorer()
+        self._contrast_markers = {"but", "however", "though", "although", "yet"}
 
     def associate(self, aspects: list[Span]) -> list[AspectSentiment]:
         by_sentence: dict[int, list[Span]] = defaultdict(list)
@@ -21,16 +22,22 @@ class AspectOpinionAssociator:
             by_sentence[asp.sent.start].append(asp)
 
         results: list[AspectSentiment] = []
-        for sentence_start, sentence_aspects in by_sentence.items():
+        for sentence_aspects in by_sentence.values():
             sentence = sentence_aspects[0].sent
             opinion_tokens = self.features.opinion_tokens(sentence)
+            boundaries = [sentence.start - 1]
+            boundaries.extend(tok.i for tok in sentence if tok.text.lower() in self._contrast_markers)
+            boundaries.append(sentence.end)
 
             for aspect in sentence_aspects:
                 center = aspect.root.i
+                left = max(b for b in boundaries if b < center)
+                right = min(b for b in boundaries if b >= center)
+
                 evidences = [
                     self.sentiment.score_opinion(sentence, op_tok, center)
                     for op_tok in opinion_tokens
-                    if abs(op_tok.i - center) <= 7
+                    if left < op_tok.i <= right and abs(op_tok.i - center) <= 5
                 ]
 
                 score = 0.0
